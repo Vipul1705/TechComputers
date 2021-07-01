@@ -1,0 +1,86 @@
+{% extends 'shop/basic.html' %}
+
+{% block title%}Checkout{%endblock%}
+{% block css %}
+.badge{
+    color:blue;
+}
+.list-group-item{
+    height:80px;
+}
+{% endblock %}
+{% block body%}
+
+<div class="container">
+   <div class="col my-4"> 
+    <h2>Step 1 - TechComputers Checkout - Review your Cart Items</h2>
+    <div class="my-4">
+   <ul class="list-group" id="items">
+    </ul>
+    <div class="container">
+    <div class="col">
+    <form action="/shop/checkout/" method="post">{% csrf_token %}
+    <button type="submit" class="btn btn-success my-4">Procced</button>
+    </form>
+    <button type="submit" class="btn btn-danger my-4 clear">Clear Cart</button> 
+    </div>
+    </div>
+    </div>
+  </div> 
+</div> 
+
+{%endblock%}
+{% block js%}
+<script>
+if (localStorage.getItem('cart') == null) {
+    var cart = {};
+} else {
+    cart = JSON.parse(localStorage.getItem('cart'));
+}
+console.log(cart);
+var sum = 0;
+var sum_price=0;
+if ($.isEmptyObject(cart)) {
+    // If object is empty
+    mystr = "<p>Your cart is empty, please add some items before checking out ! </p>"
+    $('#items').append(mystr);
+}
+else{
+  for (item in cart) {
+    let name = cart[item][1];
+    let qty = cart[item][0];
+    let price = cart[item][2];
+    let image = cart[item][3];
+    sum = sum + qty;
+    sum_price= sum_price + (qty*price);
+    mystr = `<li class="list-group-item d-flex justify-content-between align-items-center">
+                   <img src=${image} height="70px" width="70px"/> ${name}
+                    <span class="badge badge-primary badge-pill">${qty}</span>
+                </li>`
+    $('#items').append(mystr);
+    
+}
+total_price=`<li class="list-group-item d-flex justify-content-between align-items-center"><b>Total Price:</b><span class="badge badge-primary badge-pill" style="color:green">Rs.${sum_price}</span></li>`
+$('#items').append(total_price);
+}
+document.getElementById('cart').innerHTML = sum;
+
+
+$('#itemsJson').val(JSON.stringify(cart));
+
+$("#amount").val(sum_price)
+
+//if(message.tags=="success"){
+//  cart=JSON.parse(localStorage.getItem('cart'));
+//  localStorage.clear();
+//  cart = {};
+//  updateCart(cart);
+//}
+ {% comment %} $(':button').onclick('button.clear', function(){
+    cart=JSON.parse(localStorage.getItem('cart'));
+    localStorage.clear();
+    cart = {};
+    updateCart(cart);
+});  {% endcomment %}
+</script>
+{% endblock %}
