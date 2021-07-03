@@ -4,9 +4,18 @@ from django.http import response, HttpResponse
 from django.shortcuts import render, redirect
 from .models import Product, ContactUs, Orders, OrderUpdate
 import json
+from paytmchecksum import PaytmChecksum
 from math import ceil
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required,user_passes_test
+from django.views.decorators.csrf import csrf_exempt
+
+# MID:DIY12386817555501617
+# Merchant Key:bKMfNxPPf_QdZppa
+#testing payment details phone-7777777777 otp-489871
+#pip install paytmchecksum
+
 # Create your views here.
 #import the logging library
 # from logging
@@ -150,11 +159,13 @@ def productView(request,myid):
     product= Product.objects.filter(id=myid)
     return render(request, 'shop/prodView.html',{'product':product[0]})
 
+
 def checkout(request):
     if request.method=="POST":
         return render(request,'shop/order_address.html')  
     return render(request, 'shop/checkout.html')
 
+#@login_required(login_url="/shop/form1/")
 def checkout_address(request):
     if request.method =="POST":
         items_json=request.POST.get('itemsJson', '')
@@ -171,8 +182,43 @@ def checkout_address(request):
         update = OrderUpdate(order_id=order.order_id, update_desc="The Order has been placed.")
         update.save()
         id = order.order_id
-        messages.success(request, "Thanks for ordering with us. Your order id is " + str(id)+ ". Use it to track your order using our order tracker")
-        return redirect('/shop/tracker')
+    
+        O_id="1000"+str(id)#this statement is only used because of the merchant id and key used in this website have same order if so order get failed
+
+        #request the paytm to transfer the amount after payment by user
+        param_dict={
+
+            'MID': 'DIY12386817555501617',
+            'ORDER_ID': str(O_id),#you can directly used str(id) if you have autheticated merchant id and key 
+            'TXN_AMOUNT': str(amount),
+            'CUST_ID': email,
+            'INDUSTRY_TYPE_ID': 'Retail',
+            'WEBSITE': 'WEBSTAGING',
+            'CHANNEL_ID': 'WEB',
+            'CALLBACK_URL':'http://127.0.0.1:8000/shop/checkout/order_address/handlerequest/',
+
+        }
+        param_dict['CHECKSUMHASH'] = PaytmChecksum.generateSignature(param_dict,"bKMfNxPPf_QdZppa")
+        return  render(request, 'shop/paytm.html', {'param_dict': param_dict})
     return render(request, 'shop/order_address.html')
 
-   
+
+@csrf_exempt
+def handlerequest(request):
+    #paytm will send post request
+    form = request.POST
+    response_dict = {}
+    for i in form.keys():
+        response_dict[i] = form[i]
+        if i == 'CHECKSUMHASH':
+            checksum = form[i]
+
+    verify = PaytmChecksum.verifySignature(response_dict, "bKMfNxPPf_QdZppa", checksum)
+    if verify:
+        if response_dict['RESPCODE'] == '01':
+            print('order successful')
+            messages.success(request, "Thanks for ordering with us. Your order id is " + response_dict['ORDERID']+ ". Use it to track your order using our order tracker")
+        else:
+            print('order was not successful because' + response_dict['RESPMSG'])
+    return render(request, 'shop/paymentstatus.html', {'response': response_dict})
+    

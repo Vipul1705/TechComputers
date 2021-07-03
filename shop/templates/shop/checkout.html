@@ -18,16 +18,21 @@
    <ul class="list-group" id="items">
     </ul>
     <div class="container">
-    <div class="col">
-    <form action="/shop/checkout/" method="post">{% csrf_token %}
-    <button type="submit" class="btn btn-success my-4">Procced</button>
-    </form>
-    <button type="submit" class="btn btn-danger my-4 clear">Clear Cart</button> 
+        <div class="row justify-content-md-center">
+            <div class="col-md-auto">
+                <form action="/shop/checkout/" method="post">{% csrf_token %}
+                    <button type="submit" class="btn btn-success my-4">Procced</button>
+                </form>
+            </div>
+            <div class="col-md-auto">
+                <button type="submit" class="btn btn-danger my-4 clear">Clear Cart</button> 
+            </div>
+        </div>
     </div>
     </div>
     </div>
   </div> 
-</div> 
+ 
 
 {%endblock%}
 {% block js%}

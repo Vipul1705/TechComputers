@@ -1,0 +1,57 @@
+{% extends 'shop/basic.html' %}
+{% block title%} TechComputer-Payment{% endblock %}
+{% block body %}
+<div class="container">
+    {% comment %} {{response}} {% endcomment %}
+    <div class="col my-4">
+
+        <h2>Payment status regarding your order Id {{response.ORDERID}}</h2>
+        {% if response.RESPCODE == '01' %}
+        <h2>ORDER SUCCESS!</h2>
+        <table class="table table-dark table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Sr.</th>
+                    <th scope="col">Payment Info</th>
+                    <th scope="col">Content</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                <th scope="row">1</th>
+                <td>Order ID</td>
+                <td>{{response.ORDERID}}</td>
+                </tr>
+                <tr>
+                <th scope="row">2</th>
+                <td>Transaction ID</td>
+                <td>{{response.TXNID}}</td>
+                </tr>
+                <tr>
+                <th scope="row">3</th>
+                <td>Transaction Amount</td>
+                <td>{{response.CURRENCY}} {{response.TXNAMOUNT}}</td>
+                </tr>
+                <th scope="row">4</th>
+                <td>Transaction TimeStamp</td>
+                <td>{{response.TXNDATE}}</td>
+                </tr>
+                <th scope="row">5</th>
+                <td>Payment Mode</td>
+                <td>{{response.GATEWAYNAME}}</td>
+                </tr>
+            </tbody>
+            </table>
+
+        {% else %}
+        <h2>ORDER FAILURE -{{response.RESPMSG}}</h2>
+        {% endif%}
+
+    </div>
+
+</div>
+{% endblock %}
+{% block js %}
+<script>
+</script>
+{% endblock %}

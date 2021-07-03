@@ -60,29 +60,18 @@
               {% for i in range %}
               <li data-bs-target="#demo{{forloop.parentloop.counter}}" data-bs-slide-to="{{i}}" class=""></li>
               {% endfor %}
-              {% comment %} <li data-bs-target="#demo" data-bs-slide-to="2" class=""></li> {% endcomment %}
             </ul>
         
             
             <div class="container carousel-inner no-padding">
         
                 <div class="carousel-item active">
-                {% comment %} <div class="col-xs-3 col-sm-3 col-md-3">
-                  <div class="card" style="width: 18rem;">
-                    <img src='/media/{{product.0.image}}' class="card-img-top" alt="...">
-                    <div class="card-body">
-                        <h5 class="card-title">{{product.0.product_name}}</h5>
-                        <p class="card-text">{{product.0.desc}}</p>
-                        <button id="pr{{product.0.id}}" class="btn btn-primary cart">Add to Cart</button>
-                    </div>
-                  </div>
-               </div> {% endcomment %}
-        
+                
                 {% for i in product %}
 
                 <div class="col-xs-3 col-sm-3 col-md-3">
                   <div class="card align-items-center" style="width: 18rem;">
-                    <img src='/media/{{i.image}}' class="card-img-top" alt="...">
+                    <img src="/media/{{i.image}}" class="card-img-top" alt="/media/{{i.image}}" id="imagepr{{i.id}}">
                     <div class="card-body">
                       <h5 class="card-title" id="namepr{{i.id}}">{{i.product_name}}</h5><p class="card-text"><b>₹ <span  id="pricepr{{i.id}}">{{i.price}}</span></b></p>
                       <p class="card-text">{{i.desc|slice:"0:53"}}...</p>
@@ -104,11 +93,11 @@
         </div>
         </div>
              <!-- left and right controls for the slide  -->
-            <a class="carousel-control-prev " href="#demo{{forloop.counter}}" role="button" data-bs-slide="prev">
+            <a class="carousel-control-prev " href="#demo{{forloop.counter}}" role="button" data-slide="prev">
                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                 <span class="sr-only" hidden>Previous</span>
               </a>
-              <a class="carousel-control-next" href="#demo{{forloop.counter}}" role="button" data-bs-slide="next">
+              <a class="carousel-control-next" href="#demo{{forloop.counter}}" role="button" data-slide="next">
                 <span class="carousel-control-next-icon" aria-hidden="true"></span>
                 <span class="sr-only" hidden>Next</span>
               </a> 
@@ -137,7 +126,8 @@ $('.divpr').on('click', 'button.cart', function() {
         qty = 1;
         name = document.getElementById('name'+idstr).innerHTML
         price = document.getElementById('price'+idstr).innerHTML
-        cart[idstr] = [qty, name, price];
+        image = document.getElementById('image'+idstr).getAttribute('alt');
+        cart[idstr] = [qty, name, price, image];
 
     }
     updateCart(cart);
